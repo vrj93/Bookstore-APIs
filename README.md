@@ -7,7 +7,7 @@ This API is used for importing book records from a given third-party API. Record
 
 ## 2. Admin/Login
 
-This API is for authenticating the credible user and providing access to the Admin panel where he/she can perform Add/Edit/Delete operations with book records. Sanctum-based token authentication is used that is suitable for frontend frameworks. API-based authentication is used instead of "SPA authentication", which is an inbuilt feature of Sanctum.
+This API is for authenticating the credible user and providing access to the Admin panel where he/she can perform Add/Edit/Delete operations with book records. Sanctum-based token authentication is used that is suitable for frontend frameworks. API-based authentication is used instead of "SPA authentication", which is an inbuilt feature of Sanctum. Necessary validation is implemented with Request files.
 
 ## 3. book
 
@@ -20,7 +20,7 @@ For fetching singular book records based on the primary key of the book. The elo
 
 ## 5. admin/book (POST)
 
-For creating a new Book record this API gets called. As we need to modify multiple tables, To follow ACID Properties, the transaction is used.
+For creating a new Book record this API gets called. As we need to modify multiple tables, To follow ACID Properties, the transaction is used. Necessary validation is implemented with Request files.
 
 ## 6. admin/book/{id} (PATCH)
 
