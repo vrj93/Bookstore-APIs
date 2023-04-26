@@ -43,3 +43,6 @@ For deleting existing records this API is called.
 2. PHP 8.1
 3. MariaDB 10
 4. Sanctum Authentication
+
+# Note
+Postman collection is added to the Root folder for all API.
