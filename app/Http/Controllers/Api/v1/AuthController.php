@@ -13,7 +13,7 @@ class AuthController extends Controller
         if (Auth::attempt($request->all())) {
             $accessToken = Auth::user()->createToken('admin')->plainTextToken;
 
-            return response(['name' => Auth::user()->name, 'token' => $accessToken, 'message' => 'Admin authenticated'], 201);
+            return response(['name' => Auth::user()->name, 'token' => $accessToken, 'message' => 'Admin authenticated'], 200);
         } else {
             return response(['error' => 'Authentication failed'], 401);
         }
