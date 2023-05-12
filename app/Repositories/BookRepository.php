@@ -30,9 +30,9 @@ class BookRepository
             'books.title'
         );
 
-        $bookObj->leftjoin('authors', 'books.author_id', '=', 'authors.id')
-            ->leftjoin('genres', 'books.genre_id', '=', 'genres.id')
-            ->leftjoin('publishers', 'books.publisher_id', '=', 'publishers.id');
+        $bookObj->join('authors', 'books.author_id', '=', 'authors.id')
+            ->join('genres', 'books.genre_id', '=', 'genres.id')
+            ->join('publishers', 'books.publisher_id', '=', 'publishers.id');
 
         if (!empty($search->title)) {
             $bookObj->where('books.title', 'like', '%' . $search->title . '%');
