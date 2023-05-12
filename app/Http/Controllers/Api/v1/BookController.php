@@ -4,16 +4,22 @@ namespace App\Http\Controllers\Api\v1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ValidateBookRequest;
-use App\Models\Author;
 use App\Models\Book;
-use App\Models\Genre;
-use App\Models\Publisher;
+use App\Repositories\BookRepository;
 use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class BookController extends Controller
 {
+    protected $book;
+    protected $bookRepo;
+
+    public function __construct(Book $book, BookRepository $bookRepo)
+    {
+        $this->book = $book;
+        $this->bookRepo = $bookRepo;
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -21,7 +27,7 @@ class BookController extends Controller
      */
     public function index(Request $request)
     {
-        $books = Book::getBooks($request);
+        $books = $this->bookRepo->getBooks($request);
 
         if (!$books->isEmpty()) {
             $response = response(['data' => $books, 'message' => 'Books fetched successfully'], 200);
@@ -40,7 +46,7 @@ class BookController extends Controller
      */
     public function show($id)
     {
-        $bookDetails = Book::getBook($id);
+        $bookDetails = $this->bookRepo->getBook($id);
 
         if (!empty($bookDetails)) {
             $response = response(['data' => $bookDetails, 'message' => 'Book details fetched successfully'], 200);
@@ -54,31 +60,7 @@ class BookController extends Controller
     public function addBook(ValidateBookRequest $request)
     {
         try {
-            DB::transaction(function () use ($request) {
-                // Inserting/Finding Unique Author, Genre, Publisher
-                $author = Author::firstOrCreate([
-                    'name' => $request->author
-                ]);
-
-                $genre = Genre::firstOrCreate([
-                    'name' => $request->genre
-                ]);
-
-                $publisher = Publisher::firstOrCreate([
-                    'name' => $request->publisher
-                ]);
-
-                //Creating a Book record
-                $bookObj = new Book();
-                $bookObj->title = $request->title;
-                $bookObj->author_id = $author['id'];
-                $bookObj->genre_id = $genre['id'];
-                $bookObj->description = $request->description;
-                $bookObj->isbn = $request->isbn;
-                $bookObj->published = date('Y-m-d', strtotime($request->published));
-                $bookObj->publisher_id = $publisher['id'];
-                $bookObj->save();
-            });
+            $this->bookRepo->addUpdateBook($request);
 
             return response(['message' => "Book saved successfully"], 201);
         } catch (Exception $ex) {
@@ -89,31 +71,7 @@ class BookController extends Controller
     public function updateBook(ValidateBookRequest $request, $id)
     {
         try {
-            DB::transaction(function () use ($request, $id) {
-                // Inserting/Finding Unique Author, Genre, Publisher
-                $author = Author::firstOrCreate([
-                    'name' => $request->author
-                ]);
-
-                $genre = Genre::firstOrCreate([
-                    'name' => $request->genre
-                ]);
-
-                $publisher = Publisher::firstOrCreate([
-                    'name' => $request->publisher
-                ]);
-
-                //Editing a Book record
-                $bookObj = Book::find($id);
-                $bookObj->title = $request->title;
-                $bookObj->author_id = $author['id'];
-                $bookObj->genre_id = $genre['id'];
-                $bookObj->description = $request->description;
-                $bookObj->isbn = $request->isbn;
-                $bookObj->published = date('Y-m-d', strtotime($request->published));
-                $bookObj->publisher_id = $publisher['id'];
-                $bookObj->save();
-            });
+            $this->bookRepo->addUpdateBook($request, $id);
 
             return response(['message' => "Book updated successfully"], 200);
         } catch (Exception $ex) {
@@ -124,7 +82,7 @@ class BookController extends Controller
     public function deleteBook($id)
     {
         try {
-            Book::destroy($id);
+            $this->book::destroy($id);
             return response(['message' => 'Book deleted successfully'], 200);
         } catch (Exception $ex) {
             return response(['message' => $ex->getMessage()], 500);
