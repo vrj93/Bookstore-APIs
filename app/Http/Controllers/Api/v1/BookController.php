@@ -27,8 +27,46 @@ class BookController extends Controller
      */
     public function index(Request $request)
     {
-        $books = $this->bookRepo->getBooks($request);
+        $titles = [];
+        $authors = [];
+        $contents = [];
+        $genres = [];
+        $publishers = [];
+        $search = json_decode($request->search);
 
+        foreach ($search->title as $title) {
+            $titles[] = $title->text;
+        }
+
+        foreach ($search->author as $author) {
+            $authors[] = $author->text;
+        }
+
+        foreach ($search->content as $content) {
+            $contents[] = $content->text;
+        }
+
+        foreach ($search->genre as $genre) {
+            $genres[] = $genre->text;
+        }
+
+        foreach ($search->publisher as $publisher) {
+            $publishers[] = $publisher->text;
+        }
+
+        $serachArray = [
+            'title' => $titles,
+            'author' => $authors,
+            'content' => $contents,
+            'genre' => $genres,
+            'isbn' => $search->isbn,
+            'published' => $search->published,
+            'publisher' => $publishers,
+        ];
+
+        $books = $this->bookRepo->getBooks($serachArray);
+
+        return $books;
         if (!$books->isEmpty()) {
             $response = response(['data' => $books, 'message' => 'Books fetched successfully'], 200);
         } else {

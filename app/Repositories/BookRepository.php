@@ -23,50 +23,89 @@ class BookRepository
         $this->publisher = $publisher;
     }
 
-    public function getBooks($search = null)
+    public function getBooks($search = [])
     {
         $bookObj = $this->book->select(
             'books.id',
-            'books.title'
+            'books.title',
+            'books.description'
         );
 
         $bookObj->join('authors', 'books.author_id', '=', 'authors.id')
             ->join('genres', 'books.genre_id', '=', 'genres.id')
             ->join('publishers', 'books.publisher_id', '=', 'publishers.id');
 
-        if (!empty($search->title)) {
-            $bookObj->where('books.title', 'like', '%' . $search->title . '%');
+        if (!empty($search['title'])) {
+            $titles = $search['title'];
+
+            $bookObj->where(function ($query) use ($titles) {
+                foreach ($titles as $title) {
+                    $query->where('books.title', 'like', '%' . $title . '%');
+                }
+            });
         }
 
-        if (!empty($search->author)) {
-            $bookObj->where('authors.name', 'like', '%' . $search->author . '%');
+        if (!empty($search['content'])) {
+            $contents = $search['content'];
+
+            $bookObj->where(function ($query) use ($contents) {
+                foreach ($contents as $content) {
+                    $query->where('books.description', 'like', '%' . $content . '%');
+                }
+            });
         }
 
-        if (!empty($search->genre)) {
-            $bookObj->where('genres.name', '=', $search->genre);
+        if (!empty($search['author'])) {
+            $authors = $search['author'];
+
+            $bookObj->where(function ($query) use ($authors) {
+                foreach ($authors as $author) {
+                    $query->where('authors.name', 'like', '%' . $author . '%');
+                }
+            });
         }
 
-        if (!empty($search->isbn)) {
-            $bookObj->where('books.isbn', '=', $search->isbn);
+        if (!empty($search['genre'])) {
+            $genres = $search['genre'];
+
+            $bookObj->where(function ($query) use ($genres) {
+                foreach ($genres as $genre) {
+                    $query->where('genres.name', 'like', '%' . $genre . '%');
+                }
+            });
         }
 
-        if (!empty($search->published)) {
-            $bookObj->where('books.published', '=', date('Y-m-d', strtotime($search->published)));
+        if (!empty($search['isbn'])) {
+            $bookObj->where('books.isbn', $search['isbn']);
         }
 
-        if (!empty($search->publisher)) {
-            $bookObj->where('publishers.name', 'like', '%' . $search->publisher . '%');
+        if (!empty($search['published'])) {
+            $year = $search['published']->year;
+            $operator = $search['published']->duration === 'Before' ? '<' : '>';
+            $bookObj->whereYear('books.published', $operator, $year);
         }
 
-        if (!empty($search->sortname) && !empty($search->sortorder)) {
+        if (!empty($search['publisher'])) {
+            $publishers = $search['publisher'];
+
+            $bookObj->where(function ($query) use ($publishers) {
+                foreach ($publishers as $publisher) {
+                    $query->where('publishers.name', 'like', '%' . $publisher . '%');
+                }
+            });
+        }
+
+        return $bookObj->paginate(10);
+
+        /* if (!empty($search->sortname) && !empty($search->sortorder)) {
             $bookObj->orderBy($search->sortname, $search->sortorder);
-        }
+        }*/
 
-        if (!empty($search->paginate) && is_numeric($search->paginate)) {
+        /* if (!empty($search->paginate) && is_numeric($search->paginate)) {
             return $bookObj->paginate($search->paginate);
         } else {
             return $bookObj->paginate(10);
-        }
+        } */
     }
 
     public function getBook($id)
