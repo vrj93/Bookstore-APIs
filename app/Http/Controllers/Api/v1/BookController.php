@@ -62,11 +62,11 @@ class BookController extends Controller
             'isbn' => $search->isbn,
             'published' => $search->published,
             'publisher' => $publishers,
+            'paginate' => $search->paginate
         ];
 
         $books = $this->bookRepo->getBooks($serachArray);
 
-        return $books;
         if (!$books->isEmpty()) {
             $response = response(['data' => $books, 'message' => 'Books fetched successfully'], 200);
         } else {

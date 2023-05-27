@@ -95,17 +95,15 @@ class BookRepository
             });
         }
 
-        return $bookObj->paginate(10);
+        if (!empty($search['sortorder'])) {
+            $bookObj->orderBy('title', $search['sortorder']);
+        }
 
-        /* if (!empty($search->sortname) && !empty($search->sortorder)) {
-            $bookObj->orderBy($search->sortname, $search->sortorder);
-        }*/
-
-        /* if (!empty($search->paginate) && is_numeric($search->paginate)) {
-            return $bookObj->paginate($search->paginate);
+        if (!empty($search['paginate']) && is_numeric($search['paginate'])) {
+            return $bookObj->paginate($search['paginate']);
         } else {
             return $bookObj->paginate(10);
-        } */
+        }
     }
 
     public function getBook($id)
