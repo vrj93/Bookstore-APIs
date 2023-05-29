@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\v1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ValidateRequest;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
@@ -17,5 +18,9 @@ class AuthController extends Controller
         } else {
             return response(['error' => 'Authentication failed'], 401);
         }
+    }
+
+    public function validateToken() {
+        return response(['data' => 'Authentication'], 200);
     }
 }

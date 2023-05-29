@@ -15,12 +15,17 @@ class ImportBookDataController extends Controller
 {
     public function index($quantity)
     {
+
         try {
             $response = Http::get('https://fakerapi.it/api/v1/books?_quantity=' . $quantity);
             $books = $response['data'];
 
             foreach ($books as $book) {
-                DB::transaction(function () use ($book) {
+                $array = ['wallpaper1.jpg', 'wallpaper2.jpg', 'wallpaper3.jpg', 'wallpaper4.jpg', 'wallpaper5.jpg'];
+                $random_key = array_rand($array);
+                $random_value = $array[$random_key];
+
+                DB::transaction(function () use ($book, $random_value) {
                     // Inserting/Finding Unique Author, Genre, Publisher
                     $author = Author::firstOrCreate([
                         'name' => $book['author']
@@ -41,6 +46,7 @@ class ImportBookDataController extends Controller
                     $bookObj->genre_id = $genre['id'];
                     $bookObj->description = $book['description'];
                     $bookObj->isbn = $book['isbn'];
+                    $bookObj->cover = $random_value;
                     $bookObj->published = date('Y-m-d', strtotime($book['published']));
                     $bookObj->publisher_id = $publisher['id'];
                     $bookObj->save();

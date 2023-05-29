@@ -108,7 +108,7 @@ class BookRepository
 
     public function getBook($id)
     {
-        return $this->book->select('id', 'title', 'author_id', 'genre_id', 'description', 'isbn', 'published', 'publisher_id')
+        return $this->book->select('id', 'title', 'author_id', 'genre_id', 'description', 'isbn', 'cover', 'published', 'publisher_id')
             ->with(['author' => function ($query) {
                 $query->select('id', 'name');
             }])

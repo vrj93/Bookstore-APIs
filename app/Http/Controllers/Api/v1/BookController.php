@@ -8,6 +8,7 @@ use App\Models\Book;
 use App\Repositories\BookRepository;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class BookController extends Controller
 {
@@ -125,5 +126,32 @@ class BookController extends Controller
         } catch (Exception $ex) {
             return response(['message' => $ex->getMessage()], 500);
         }
+    }
+
+    public function uploadCover(Request $request, Book $book)
+    {
+        if ($request->hasFile('cover')) {
+            //Delect old cover
+            $oldCoverPath = $book->cover != '' ? 'public/img/book_cover/' . $book->cover : '';
+
+            if (Storage::exists($oldCoverPath)) {
+                Storage::delete($oldCoverPath);
+            }
+
+            $cover = $request->file('cover');
+            $extension = $cover->getClientOriginalExtension();
+            $coverName = uniqid() . '.' . $extension;
+
+            $cover->storeAs('public/img/book_cover', $coverName);
+
+            $book->cover = $coverName;
+            $book->save();
+
+            $response = response(['message' => 'Cover saved successfully'], 200);
+        } else {
+            $response = response(['message' => 'No book cover found'], 400);
+        }
+
+        return $response;
     }
 }
