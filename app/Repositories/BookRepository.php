@@ -123,7 +123,9 @@ class BookRepository
 
     public function addUpdateBook($data, $id = null)
     {
-        DB::transaction(function () use ($data, $id) {
+        $insertedBookId = null;
+
+        DB::transaction(function () use ($data, $id, &$insertedBookId) {
             // Inserting/Finding Unique Author, Genre, Publisher
             $author = $this->author->firstOrCreate([
                 'name' => $data->author
@@ -152,6 +154,10 @@ class BookRepository
             $bookObj->published = date('Y-m-d', strtotime($data->published));
             $bookObj->publisher_id = $publisher['id'];
             $bookObj->save();
+
+            $insertedBookId = $bookObj->id;
         });
+
+        return $insertedBookId;
     }
 }

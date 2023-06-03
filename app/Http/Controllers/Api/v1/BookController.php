@@ -99,9 +99,9 @@ class BookController extends Controller
     public function addBook(ValidateBookRequest $request)
     {
         try {
-            $this->bookRepo->addUpdateBook($request);
+            $bookId = $this->bookRepo->addUpdateBook($request);
 
-            return response(['message' => "Book saved successfully"], 201);
+            return response(['data' => $bookId, 'message' => "Book saved successfully"], 200);
         } catch (Exception $ex) {
             return response(['message' => $ex->getMessage()], 500);
         }
