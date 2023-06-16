@@ -14,6 +14,7 @@ Route::prefix('v1')->group(function () {
     Route::apiResource('book', BookController::class);
 
     Route::post('token', [AuthController::class, 'validateToken'])->middleware('auth:sanctum');
+    Route::post('logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
 
     Route::group(['middleware' => ['auth:sanctum'], 'prefix' => 'admin/book'], function () {
         Route::post('/', [BookController::class, 'addBook']);
