@@ -7,6 +7,7 @@ use App\Models\Book;
 use App\Models\Genre;
 use App\Models\Publisher;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Redis;
 
 class BookRepository
 {
@@ -156,6 +157,10 @@ class BookRepository
             $bookObj->save();
 
             $insertedBookId = $bookObj->id;
+
+            $book = $this->getBook($insertedBookId);
+
+            Redis::setex('book:' . $insertedBookId, 60 * 60 * 2, $book);
         });
 
         return $insertedBookId;

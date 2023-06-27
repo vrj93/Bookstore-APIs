@@ -8,6 +8,7 @@ use App\Models\Book;
 use App\Repositories\BookRepository;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Storage;
 
 class BookController extends Controller
@@ -85,7 +86,14 @@ class BookController extends Controller
      */
     public function show($id)
     {
-        $bookDetails = $this->bookRepo->getBook($id);
+        $book = Redis::get('book:' . $id);
+
+        if (isset($book)) {
+            $bookDetails = json_decode($book, true);
+        } else {
+            $bookDetails = $this->bookRepo->getBook($id);
+            Redis::setex('book:' . $id, 60 * 60 * 2, $bookDetails);
+        }
 
         if (!empty($bookDetails)) {
             $response = response(['data' => $bookDetails, 'message' => 'Book details fetched successfully'], 200);
